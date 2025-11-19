@@ -12,9 +12,10 @@ Model name is converted to lowercase for the collection name:
 """
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
+from datetime import datetime, date
 
-# Example schemas (replace with your own):
+# Example schemas (kept for reference/examples):
 
 class User(BaseModel):
     """
@@ -38,8 +39,32 @@ class Product(BaseModel):
     category: str = Field(..., description="Product category")
     in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
 # --------------------------------------------------
+# CRM Schemas
+# --------------------------------------------------
+
+class Employee(BaseModel):
+    """
+    Employees collection schema
+    Collection name: "employee"
+    """
+    name: str = Field(..., description="Employee full name")
+    role: Optional[str] = Field(None, description="Job role/title")
+    monthly_salary: float = Field(..., ge=0, description="Monthly salary amount")
+    start_date: Optional[date] = Field(None, description="Employment start date")
+    is_active: bool = Field(True, description="Active employment status")
+
+class FinanceRecord(BaseModel):
+    """
+    Finance records for revenue, expenses, and salaries
+    Collection name: "financerecord"
+    """
+    type: Literal["revenue", "expense", "salary"] = Field(..., description="Record type")
+    amount: float = Field(..., gt=0, description="Transaction amount (positive number)")
+    date: datetime = Field(default_factory=datetime.utcnow, description="Date/time of the record")
+    category: Optional[str] = Field(None, description="Category (e.g., subscription, rent, sales)")
+    description: Optional[str] = Field(None, description="Short description")
+    employee_id: Optional[str] = Field(None, description="Related employee id (for salary records)")
 
 # Note: The Flames database viewer will automatically:
 # 1. Read these schemas from GET /schema endpoint
